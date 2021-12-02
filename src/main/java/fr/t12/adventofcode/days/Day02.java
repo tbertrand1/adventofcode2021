@@ -1,7 +1,6 @@
 package fr.t12.adventofcode.days;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class Day02 extends Day<List<Day02.Action>, Integer, Integer> {
 
@@ -10,18 +9,12 @@ public class Day02 extends Day<List<Day02.Action>, Integer, Integer> {
     }
 
     @Override
-    public List<Action> getInput() {
-        return convertLinesToActions(readInputAsListOfString());
-    }
-
-    protected List<Action> convertLinesToActions(List<String> lines) {
-        return lines.stream()
-                .map(Action::parse)
-                .collect(Collectors.toList());
+    protected List<Action> getInput() {
+        return readInputAsItems(Action::parse);
     }
 
     @Override
-    public Integer resolvePart1(List<Action> input) {
+    protected Integer resolvePart1(List<Action> input) {
         int horizontalPosition = 0;
         int depth = 0;
         for (Action action : input) {
@@ -35,7 +28,7 @@ public class Day02 extends Day<List<Day02.Action>, Integer, Integer> {
     }
 
     @Override
-    public Integer resolvePart2(List<Action> input) {
+    protected Integer resolvePart2(List<Action> input) {
         int horizontalPosition = 0;
         int depth = 0;
         int aim = 0;
@@ -52,11 +45,11 @@ public class Day02 extends Day<List<Day02.Action>, Integer, Integer> {
         return horizontalPosition * depth;
     }
 
-    public enum Direction {
+    protected enum Direction {
         FORWARD, DOWN, UP
     }
 
-    public record Action(Direction direction, Integer value) {
+    protected record Action(Direction direction, Integer value) {
         public static Action parse(String line) {
             String[] split = line.split(" ");
             return new Action(

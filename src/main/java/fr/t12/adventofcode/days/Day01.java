@@ -9,12 +9,12 @@ public class Day01 extends Day<List<Integer>, Integer, Integer> {
     }
 
     @Override
-    public List<Integer> getInput() {
-        return readInputAsListOfInteger();
+    protected List<Integer> getInput() {
+        return readInputAsItems(Integer::parseInt);
     }
 
     @Override
-    public Integer resolvePart1(List<Integer> input) {
+    protected Integer resolvePart1(List<Integer> input) {
         int nbIncreased = 0;
         int previousMeasure = input.get(0);
         for (int i = 1; i < input.size(); i++) {
@@ -28,7 +28,7 @@ public class Day01 extends Day<List<Integer>, Integer, Integer> {
     }
 
     @Override
-    public Integer resolvePart2(List<Integer> input) {
+    protected Integer resolvePart2(List<Integer> input) {
         int nbSumIncreased = 0;
         int previousSum = input.get(0) + input.get(1) + input.get(2);
         for (int i = 3; i < input.size(); i++) {

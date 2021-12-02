@@ -6,6 +6,7 @@ import org.apache.commons.lang3.time.StopWatch;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public abstract class Day<I, O1, O2> {
@@ -16,11 +17,11 @@ public abstract class Day<I, O1, O2> {
         this.dayNumber = dayNumber;
     }
 
-    protected String getDayNumberFormatted() {
+    private String getDayNumberFormatted() {
         return StringUtils.leftPad(String.valueOf(dayNumber), 2, '0');
     }
 
-    protected String getInputFilename() {
+    private String getInputFilename() {
         return String.format("inputs/day%s.txt", getDayNumberFormatted());
     }
 
@@ -28,22 +29,18 @@ public abstract class Day<I, O1, O2> {
         return FileUtil.readFile(getInputFilename());
     }
 
-    protected List<String> readInputAsListOfString() {
-        return FileUtil.readFileLines(getInputFilename());
-    }
-
-    protected List<Integer> readInputAsListOfInteger() {
-        return readInputAsListOfString()
+    protected <T> List<T> readInputAsItems(Function<String, T> parseItemFn) {
+        return FileUtil.readFileLines(getInputFilename())
                 .stream()
-                .map(Integer::parseInt)
+                .map(parseItemFn)
                 .collect(Collectors.toList());
     }
 
-    public abstract I getInput();
+    protected abstract I getInput();
 
-    public abstract O1 resolvePart1(I input);
+    protected abstract O1 resolvePart1(I input);
 
-    public abstract O2 resolvePart2(I input);
+    protected abstract O2 resolvePart2(I input);
 
     public void resolveDay() {
         System.out.printf("Day %s\n", getDayNumberFormatted());
