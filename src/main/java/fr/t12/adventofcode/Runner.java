@@ -2,13 +2,14 @@ package fr.t12.adventofcode;
 
 import fr.t12.adventofcode.days.Day;
 import fr.t12.adventofcode.days.Day01;
+import fr.t12.adventofcode.days.Day02;
 
 import java.util.List;
 
 public class Runner {
 
     private static final List<Class<? extends Day<?, ?, ?>>> DAYS_CLASSES = List.of(
-            Day01.class
+            Day01.class, Day02.class
     );
 
     public static void main(String[] args) {
