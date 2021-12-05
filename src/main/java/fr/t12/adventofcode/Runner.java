@@ -7,7 +7,7 @@ import java.util.List;
 public class Runner {
 
     private static final List<Class<? extends Day<?, ?, ?>>> DAYS_CLASSES = List.of(
-            Day01.class, Day02.class, Day03.class, Day04.class
+            Day01.class, Day02.class, Day03.class, Day04.class, Day05.class
     );
 
     public static void main(String[] args) {
