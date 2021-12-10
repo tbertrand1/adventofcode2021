@@ -1,11 +1,10 @@
 package fr.t12.adventofcode.days;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 public class Day05 extends Day<List<Day05.Line>, Long, Long> {
+
+    private static final int SIZE = 1_000;
 
     public Day05() {
         super(5);
@@ -18,27 +17,28 @@ public class Day05 extends Day<List<Day05.Line>, Long, Long> {
 
     @Override
     protected Long resolvePart1(List<Line> input) {
-        return input.stream()
-                .filter(Line::isHorizontalOrVertical)
-                .map(Line::generateAllCoordinates)
-                .flatMap(List::stream)
-                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
-                .values()
-                .stream()
-                .filter(v -> v >= 2)
-                .count();
+        long[][] cells = new long[SIZE][SIZE];
+        input.stream().filter(Line::isHorizontalOrVertical).forEach(line -> line.completeMap(cells));
+        return countNbCellsWithValueGreaterThan1(cells);
     }
 
     @Override
     protected Long resolvePart2(List<Line> input) {
-        return input.stream()
-                .map(Line::generateAllCoordinates)
-                .flatMap(List::stream)
-                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
-                .values()
-                .stream()
-                .filter(v -> v >= 2)
-                .count();
+        long[][] cells = new long[SIZE][SIZE];
+        input.forEach(line -> line.completeMap(cells));
+        return countNbCellsWithValueGreaterThan1(cells);
+    }
+
+    private long countNbCellsWithValueGreaterThan1(long[][] cells) {
+        long count = 0;
+        for (long[] row : cells) {
+            for (long value : row) {
+                if (value > 1) {
+                    count++;
+                }
+            }
+        }
+        return count;
     }
 
     record Coordinate(int x, int y) {
@@ -58,21 +58,16 @@ public class Day05 extends Day<List<Day05.Line>, Long, Long> {
             return c1.x == c2.x || c1.y == c2.y;
         }
 
-        public List<Coordinate> generateAllCoordinates() {
-            List<Coordinate> coordinates = new ArrayList<>();
-            coordinates.add(c1);
-
+        public void completeMap(long[][] cells) {
             int deltaX = Integer.compare(c2.x, c1.x);
             int deltaY = Integer.compare(c2.y, c1.y);
             int currentX = c1.x;
             int currentY = c1.y;
-            while (currentX != c2.x || currentY != c2.y) {
+            while (currentX != c2.x + deltaX || currentY != c2.y + deltaY) {
+                cells[currentX][currentY] += 1;
                 currentX += deltaX;
                 currentY += deltaY;
-                coordinates.add(new Coordinate(currentX, currentY));
             }
-
-            return coordinates;
         }
     }
 }

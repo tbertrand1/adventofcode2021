@@ -2,10 +2,8 @@ package fr.t12.adventofcode.days;
 
 import fr.t12.adventofcode.common.FileUtil;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.time.StopWatch;
 
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -47,16 +45,12 @@ public abstract class Day<I, O1, O2> {
 
         I input = getInput();
 
-        StopWatch watch = new StopWatch();
-        watch.start();
+        long start = System.currentTimeMillis();
         O1 result1 = resolvePart1(input);
-        watch.stop();
-        System.out.printf("\tPart 1: %s (%d ms)\n", result1, watch.getTime(TimeUnit.MILLISECONDS));
-        watch.reset();
+        System.out.printf("\tPart 1: %s (%d ms)\n", result1, System.currentTimeMillis() - start);
 
-        watch.start();
+        start = System.currentTimeMillis();
         O2 result2 = resolvePart2(input);
-        watch.stop();
-        System.out.printf("\tPart 2: %s (%d ms)\n", result2, watch.getTime(TimeUnit.MILLISECONDS));
+        System.out.printf("\tPart 2: %s (%d ms)\n", result2, System.currentTimeMillis() - start);
     }
 }

@@ -12,12 +12,17 @@ public class Runner {
     );
 
     public static void main(String[] args) {
-        DAYS_CLASSES.forEach(c -> {
+        long start = System.currentTimeMillis();
+        int nbDays = 0;
+        for (var clazz : DAYS_CLASSES) {
             try {
-                c.getDeclaredConstructor().newInstance().resolveDay();
+                clazz.getDeclaredConstructor().newInstance().resolveDay();
+                nbDays++;
             } catch (Exception e) {
+                System.err.printf("Day %d failed", nbDays + 1);
                 e.printStackTrace();
             }
-        });
+        }
+        System.out.printf("\nTotal time: %d ms (%d days)\n", System.currentTimeMillis() - start, nbDays);
     }
 }
