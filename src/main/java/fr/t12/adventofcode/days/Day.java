@@ -3,6 +3,7 @@ package fr.t12.adventofcode.days;
 import fr.t12.adventofcode.common.FileUtil;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.File;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -21,6 +22,14 @@ public abstract class Day<I, O1, O2> {
 
     private String getInputFilename() {
         return String.format("inputs/day%s.txt", getDayNumberFormatted());
+    }
+
+    protected String getSimulationFilename(String extension) {
+        File file = new File("simulations");
+        if (!file.exists()) {
+            file.mkdir();
+        }
+        return String.format("%s/day%s.%s", file.getPath(), getDayNumberFormatted(), extension);
     }
 
     protected String readInputAsString() {
@@ -52,5 +61,8 @@ public abstract class Day<I, O1, O2> {
         start = System.currentTimeMillis();
         O2 result2 = resolvePart2(input);
         System.out.printf("\tPart 2: %s (%d ms)\n", result2, System.currentTimeMillis() - start);
+    }
+
+    public void simulation() {
     }
 }

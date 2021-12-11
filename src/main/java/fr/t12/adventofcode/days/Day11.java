@@ -1,5 +1,14 @@
 package fr.t12.adventofcode.days;
 
+import fr.t12.adventofcode.common.GifSequenceWriter;
+
+import javax.imageio.stream.FileImageOutputStream;
+import javax.imageio.stream.ImageOutputStream;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.awt.image.RenderedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -8,8 +17,10 @@ import java.util.function.Function;
 
 public class Day11 extends Day<List<String>, Integer, Integer> {
 
+    public static final int CELL_SIZE = 50;
     private static final int SIZE = 10;
     private static final int NB_STEPS = 100;
+
 
     public Day11() {
         super(11);
@@ -61,6 +72,42 @@ public class Day11 extends Day<List<String>, Integer, Integer> {
         }
         cells.forEach(cell -> cell.determineNeighbors(cells));
         return cells;
+    }
+
+    public void simulation() {
+        try (
+                ImageOutputStream output = new FileImageOutputStream(new File(getSimulationFilename("gif")));
+                GifSequenceWriter writer = new GifSequenceWriter(output, BufferedImage.TYPE_INT_RGB, 250, false)
+        ) {
+            List<Cell> cells = initializeCells(getInput());
+            writer.writeToSequence(generateBufferedImage(cells));
+            int step = 0;
+            while (step < NB_STEPS) {
+                step++;
+                Set<Cell> cellsFlashes = new HashSet<>();
+                cells.forEach(cell -> cell.incrementValueAndFlash(cellsFlashes));
+                writer.writeToSequence(generateBufferedImage(cells));
+            }
+        } catch (IOException e) {
+            System.err.println("Error while generating simulation");
+            e.printStackTrace();
+        }
+    }
+
+    private RenderedImage generateBufferedImage(List<Cell> cells) {
+        BufferedImage bufferedImage = new BufferedImage(CELL_SIZE * SIZE, CELL_SIZE * SIZE, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g2d = bufferedImage.createGraphics();
+        for (Cell cell : cells) {
+            if (cell.value == 0) {
+                g2d.setColor(new Color(255, 255, 0));
+            } else {
+                int value = cell.value * 26;
+                g2d.setColor(new Color(value, value, 0));
+            }
+            g2d.fillRect(cell.x * CELL_SIZE, cell.y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+        }
+        g2d.dispose();
+        return bufferedImage;
     }
 
     static class Cell {
