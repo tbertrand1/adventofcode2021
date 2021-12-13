@@ -47,20 +47,38 @@ public abstract class Day<I, O1, O2> {
 
     protected abstract O1 resolvePart1(I input);
 
+    protected String formatPart1Result(O1 result1) {
+        return result1.toString();
+    }
+
     protected abstract O2 resolvePart2(I input);
 
+    protected String formatPart2Result(O2 result2) {
+        return result2.toString();
+    }
+
     public void resolveDay() {
-        System.out.printf("Day %s\n", getDayNumberFormatted());
-
+        long inputStart = System.currentTimeMillis();
         I input = getInput();
+        long inputElapsedTime = System.currentTimeMillis() - inputStart;
 
-        long start = System.currentTimeMillis();
+        long part1Start = System.currentTimeMillis();
         O1 result1 = resolvePart1(input);
-        System.out.printf("\tPart 1: %s (%d ms)\n", result1, System.currentTimeMillis() - start);
+        long part1ElapsedTime = System.currentTimeMillis() - part1Start;
 
-        start = System.currentTimeMillis();
+        long part2Start = System.currentTimeMillis();
         O2 result2 = resolvePart2(input);
-        System.out.printf("\tPart 2: %s (%d ms)\n", result2, System.currentTimeMillis() - start);
+        long part2ElapsedTime = System.currentTimeMillis() - part2Start;
+
+        System.out.printf(
+                "Day %s (%d ms | %d ms | %d ms): %s | %s\n",
+                getDayNumberFormatted(),
+                inputElapsedTime,
+                part1ElapsedTime,
+                part2ElapsedTime,
+                formatPart1Result(result1),
+                formatPart2Result(result2)
+        );
     }
 
     public void simulation() {
