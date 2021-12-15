@@ -45,16 +45,11 @@ public class Day15 extends Day<List<String>, Integer, Integer> {
         }
     }
 
-    record PositionComparator(Position end, Map<Position, Integer> cheapestPaths) implements Comparator<Position> {
-
-        private static int manhattanDistance(Position position, Position endPosition) {
-            return Math.abs(position.x - endPosition.x) + Math.abs(position.y - endPosition.y);
-        }
-
+    record PositionComparator(Map<Position, Integer> cheapestPaths) implements Comparator<Position> {
         @Override
         public int compare(Position p1, Position p2) {
-            int scoreP1 = this.cheapestPaths.get(p1) + manhattanDistance(p1, this.end);
-            int scoreP2 = this.cheapestPaths.get(p2) + manhattanDistance(p2, this.end);
+            int scoreP1 = this.cheapestPaths.get(p1);
+            int scoreP2 = this.cheapestPaths.get(p2);
             return scoreP1 - scoreP2;
         }
     }
@@ -91,7 +86,7 @@ public class Day15 extends Day<List<String>, Integer, Integer> {
             Map<Position, Integer> cheapestPaths = new HashMap<>();
             cheapestPaths.put(start, 0);
 
-            PriorityQueue<Position> positionsToCheck = new PriorityQueue<>(new PositionComparator(end, cheapestPaths));
+            PriorityQueue<Position> positionsToCheck = new PriorityQueue<>(new PositionComparator(cheapestPaths));
             positionsToCheck.add(start);
 
             while (!positionsToCheck.isEmpty()) {
