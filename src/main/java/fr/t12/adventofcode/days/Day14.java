@@ -32,9 +32,9 @@ public class Day14 extends Day<List<String>, Long, Long> {
 		Map<String, Long> elementCounts = new HashMap<>();
 		for (int i = 0; i < template.length(); i++) {
 			if (i < template.length() - 1) {
-				incrementValue(pairCounts, template.substring(i, i + 2));
+				pairCounts.merge(template.substring(i, i + 2), 1L, Long::sum);
 			}
-			incrementValue(elementCounts, template.substring(i, i + 1));
+			elementCounts.merge(template.substring(i, i + 1), 1L, Long::sum);
 		}
 
 		Map<String, String> elementInsertions = new HashMap<>();
@@ -50,9 +50,9 @@ public class Day14 extends Day<List<String>, Long, Long> {
 				if (elementInsertions.containsKey(pair)) {
 					String newElement = elementInsertions.get(pair);
 					Long nbPairs = pairCounts.get(pair);
-					incrementValue(newPairCounts, pair.charAt(0) + newElement, nbPairs);
-					incrementValue(newPairCounts, newElement + pair.charAt(1), nbPairs);
-					incrementValue(elementCounts, newElement, nbPairs);
+					newPairCounts.merge(pair.charAt(0) + newElement, nbPairs, Long::sum);
+					newPairCounts.merge(newElement + pair.charAt(1), nbPairs, Long::sum);
+					elementCounts.merge(newElement, nbPairs, Long::sum);
 				}
 			}
 			pairCounts = newPairCounts;
@@ -64,13 +64,5 @@ public class Day14 extends Day<List<String>, Long, Long> {
 				.sorted()
 				.toList();
 		return elementCountsSorted.get(elementCountsSorted.size() - 1) - elementCountsSorted.get(0);
-	}
-
-	private static void incrementValue(Map<String, Long> map, String key, Long value) {
-		map.put(key, map.getOrDefault(key, 0L) + value);
-	}
-
-	private static void incrementValue(Map<String, Long> map, String key) {
-		incrementValue(map, key, 1L);
 	}
 }
