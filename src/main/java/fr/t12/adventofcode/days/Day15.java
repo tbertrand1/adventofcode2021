@@ -1,6 +1,9 @@
 package fr.t12.adventofcode.days;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.PriorityQueue;
 import java.util.function.Function;
 
 public class Day15 extends Day<List<String>, Integer, Integer> {
@@ -45,13 +48,7 @@ public class Day15 extends Day<List<String>, Integer, Integer> {
         }
     }
 
-    record PositionComparator(Map<Position, Integer> cheapestPaths) implements Comparator<Position> {
-        @Override
-        public int compare(Position p1, Position p2) {
-            int scoreP1 = this.cheapestPaths.get(p1);
-            int scoreP2 = this.cheapestPaths.get(p2);
-            return scoreP1 - scoreP2;
-        }
+    record PositionWithDistance(Position position, int distance) {
     }
 
     static class Cave {
@@ -83,29 +80,42 @@ public class Day15 extends Day<List<String>, Integer, Integer> {
             Position start = new Position(0, 0);
             Position end = new Position(increaseWidth - 1, increaseHeight - 1);
 
-            Map<Position, Integer> cheapestPaths = new HashMap<>();
-            cheapestPaths.put(start, 0);
+            int[][] distances = buildDistancesArray(increaseWidth, increaseHeight);
+            distances[0][0] = 0;
 
-            PriorityQueue<Position> positionsToCheck = new PriorityQueue<>(new PositionComparator(cheapestPaths));
-            positionsToCheck.add(start);
+            PriorityQueue<PositionWithDistance> positionsToCheck = new PriorityQueue<>(Comparator.comparingInt(PositionWithDistance::distance));
+            positionsToCheck.add(new PositionWithDistance(start, 0));
 
             while (!positionsToCheck.isEmpty()) {
-                Position position = positionsToCheck.poll();
+                Position position = positionsToCheck.poll().position;
                 if (position.equals(end)) {
-                    return cheapestPaths.get(position);
+                    return distances[position.y][position.x];
                 }
                 for (Position neighbor : position.getNeighbors(increaseWidth, increaseHeight)) {
-                    int newPath = cheapestPaths.get(position) + getRiskLevel(neighbor);
-                    if (newPath < cheapestPaths.getOrDefault(neighbor, Integer.MAX_VALUE)) {
-                        cheapestPaths.put(neighbor, newPath);
-                        if (!positionsToCheck.contains(neighbor)) {
-                            positionsToCheck.add(neighbor);
-                        }
+                    int newDistance = distances[position.y][position.x] + getRiskLevel(neighbor);
+                    if (newDistance < distances[neighbor.y][neighbor.x]) {
+                        distances[neighbor.y][neighbor.x] = newDistance;
+                        positionsToCheck.add(new PositionWithDistance(neighbor, newDistance));
                     }
                 }
             }
 
             throw new IllegalStateException("No solution found");
+        }
+
+        private int[][] buildDistancesArray(int width, int height) {
+            int[][] distances = new int[height][];
+            int y = 0;
+            while (y < height) {
+                distances[y] = new int[width];
+                int x = 0;
+                while (x < width) {
+                    distances[y][x] = Integer.MAX_VALUE;
+                    x++;
+                }
+                y++;
+            }
+            return distances;
         }
 
         private int getRiskLevel(Position position) {
