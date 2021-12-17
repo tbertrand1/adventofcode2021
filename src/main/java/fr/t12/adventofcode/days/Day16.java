@@ -4,7 +4,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.mutable.MutableInt;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Day16 extends Day<String, Integer, Long> {
 
@@ -13,12 +15,11 @@ public class Day16 extends Day<String, Integer, Long> {
     }
 
     private static String hexToBinary(String value) {
-        StringBuilder binary = new StringBuilder();
-        for (char c : value.toCharArray()) {
-            String charBinary = Integer.toBinaryString(Integer.parseInt(Character.toString(c), 16));
-            binary.append(StringUtils.leftPad(charBinary, 4, "0"));
-        }
-        return binary.toString();
+        return Arrays.stream(value.split(""))
+                .map(c -> Integer.parseInt(c, 16))
+                .map(Integer::toBinaryString)
+                .map(binary -> StringUtils.leftPad(binary, 4, "0"))
+                .collect(Collectors.joining(""));
     }
 
     private static long binaryToLong(String value) {

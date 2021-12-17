@@ -1,9 +1,6 @@
 package fr.t12.adventofcode.days;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.PriorityQueue;
+import java.util.*;
 import java.util.function.Function;
 
 public class Day15 extends Day<List<String>, Integer, Integer> {
@@ -59,32 +56,22 @@ public class Day15 extends Day<List<String>, Integer, Integer> {
         protected Cave(List<String> lines) {
             this.height = lines.size();
             this.width = lines.get(0).length();
-
-            this.riskLevel = new int[this.height][];
-            int y = 0;
-            while (y < this.height) {
-                this.riskLevel[y] = new int[this.width];
-                int x = 0;
-                while (x < this.width) {
-                    this.riskLevel[y][x] = Character.getNumericValue(lines.get(y).charAt(x));
-                    x++;
-                }
-                y++;
-            }
+            this.riskLevel = lines.stream()
+                    .map(s -> Arrays.stream(s.split("")).mapToInt(Integer::parseInt).toArray())
+                    .toArray(int[][]::new);
         }
 
         public int findLowestTotalRisk(int increaseMultiplier) {
             int increaseWidth = increaseMultiplier * this.width;
             int increaseHeight = increaseMultiplier * this.height;
 
-            Position start = new Position(0, 0);
             Position end = new Position(increaseWidth - 1, increaseHeight - 1);
 
             int[][] distances = buildDistancesArray(increaseWidth, increaseHeight);
             distances[0][0] = 0;
 
             PriorityQueue<PositionWithDistance> positionsToCheck = new PriorityQueue<>(Comparator.comparingInt(PositionWithDistance::distance));
-            positionsToCheck.add(new PositionWithDistance(start, 0));
+            positionsToCheck.add(new PositionWithDistance(new Position(0, 0), 0));
 
             while (!positionsToCheck.isEmpty()) {
                 Position position = positionsToCheck.poll().position;
@@ -108,11 +95,7 @@ public class Day15 extends Day<List<String>, Integer, Integer> {
             int y = 0;
             while (y < height) {
                 distances[y] = new int[width];
-                int x = 0;
-                while (x < width) {
-                    distances[y][x] = Integer.MAX_VALUE;
-                    x++;
-                }
+                Arrays.fill(distances[y], Integer.MAX_VALUE);
                 y++;
             }
             return distances;

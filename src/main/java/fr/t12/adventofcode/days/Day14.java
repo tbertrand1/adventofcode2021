@@ -59,10 +59,8 @@ public class Day14 extends Day<List<String>, Long, Long> {
 			step++;
 		}
 
-		List<Long> elementCountsSorted = elementCounts.values()
-				.stream()
-				.sorted()
-				.toList();
-		return elementCountsSorted.get(elementCountsSorted.size() - 1) - elementCountsSorted.get(0);
+		long min = elementCounts.values().stream().reduce(Long::min).orElseThrow();
+		long max = elementCounts.values().stream().reduce(Long::max).orElseThrow();
+		return max - min;
 	}
 }
