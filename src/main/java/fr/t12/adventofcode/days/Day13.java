@@ -60,7 +60,7 @@ public class Day13 extends Day<List<String>, Integer, Day13.Paper> {
                 }
             }
         }
-        return new Tuple<>(dots, instructions);
+        return Tuple.of(dots, instructions);
     }
 
     record Dot(int x, int y) {
