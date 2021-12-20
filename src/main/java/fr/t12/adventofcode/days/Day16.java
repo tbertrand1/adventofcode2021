@@ -1,5 +1,6 @@
 package fr.t12.adventofcode.days;
 
+import fr.t12.adventofcode.common.BinaryUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.mutable.MutableInt;
 
@@ -20,10 +21,6 @@ public class Day16 extends Day<String, Integer, Long> {
                 .map(Integer::toBinaryString)
                 .map(binary -> StringUtils.leftPad(binary, 4, "0"))
                 .collect(Collectors.joining(""));
-    }
-
-    private static long binaryToLong(String value) {
-        return Long.parseLong(value, 2);
     }
 
     @Override
@@ -70,35 +67,35 @@ public class Day16 extends Day<String, Integer, Long> {
         }
 
         private void parseVersion(String inputBinary, MutableInt position) {
-            this.version = (int) binaryToLong(readBits(inputBinary, position, 3));
+            this.version = (int) BinaryUtil.binaryToLong(readBits(inputBinary, position, 3));
         }
 
         private void parseType(String inputBinary, MutableInt position) {
-            this.type = (int) binaryToLong(readBits(inputBinary, position, 3));
+            this.type = (int) BinaryUtil.binaryToLong(readBits(inputBinary, position, 3));
         }
 
         private void parseValue(String binary, MutableInt position) {
             StringBuilder packetValue = new StringBuilder();
             while (true) {
-                long groupBit = binaryToLong(readBits(binary, position, 1));
+                long groupBit = BinaryUtil.binaryToLong(readBits(binary, position, 1));
                 packetValue.append(readBits(binary, position, 4));
                 if (groupBit == 0) {
                     break;
                 }
             }
-            this.value = binaryToLong(packetValue.toString());
+            this.value = BinaryUtil.binaryToLong(packetValue.toString());
         }
 
         private void parseSubPackets(String inputBinary, MutableInt position) {
-            long lengthType = binaryToLong(readBits(inputBinary, position, 1));
+            long lengthType = BinaryUtil.binaryToLong(readBits(inputBinary, position, 1));
             if (lengthType == 0) {
-                long subPacketsLength = binaryToLong(readBits(inputBinary, position, 15));
+                long subPacketsLength = BinaryUtil.binaryToLong(readBits(inputBinary, position, 15));
                 long subPacketsEnd = position.intValue() + subPacketsLength;
                 while (position.intValue() != subPacketsEnd) {
                     this.subPackets.add(Packet.parse(inputBinary, position));
                 }
             } else {
-                long subPacketsCount = binaryToLong(readBits(inputBinary, position, 11));
+                long subPacketsCount = BinaryUtil.binaryToLong(readBits(inputBinary, position, 11));
                 int indexSubPacket = 0;
                 while (indexSubPacket < subPacketsCount) {
                     this.subPackets.add(Packet.parse(inputBinary, position));
