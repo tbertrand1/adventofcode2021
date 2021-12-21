@@ -1,11 +1,15 @@
 package fr.t12.adventofcode.days;
 
+import fr.t12.adventofcode.common.Tuple;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
 public class Day14 extends Day<List<String>, Long, Long> {
+	private static final int NB_STEPS_PART_1 = 10;
+	private static final int NB_STEPS_PART_2 = 40;
 
 	public Day14() {
 		super(14);
@@ -17,16 +21,7 @@ public class Day14 extends Day<List<String>, Long, Long> {
 	}
 
 	@Override
-	protected Long resolvePart1(List<String> input) {
-		return resolve(input, 10);
-	}
-
-	@Override
-	protected Long resolvePart2(List<String> input) {
-		return resolve(input, 40);
-	}
-
-	private Long resolve(List<String> input, int nbSteps) {
+	protected Tuple<Long, Long> resolvePart1AndPart2(List<String> input) {
 		String template = input.get(0);
 		Map<String, Long> pairCounts = new HashMap<>();
 		Map<String, Long> elementCounts = new HashMap<>();
@@ -43,8 +38,9 @@ public class Day14 extends Day<List<String>, Long, Long> {
 			elementInsertions.put(split[0], split[1]);
 		}
 
+		long resultPart1 = 0L;
 		int step = 0;
-		while (step < nbSteps) {
+		while (step < NB_STEPS_PART_2) {
 			Map<String, Long> newPairCounts = new HashMap<>();
 			for (String pair : pairCounts.keySet()) {
 				if (elementInsertions.containsKey(pair)) {
@@ -57,8 +53,16 @@ public class Day14 extends Day<List<String>, Long, Long> {
 			}
 			pairCounts = newPairCounts;
 			step++;
+			if (step == NB_STEPS_PART_1) {
+				resultPart1 = calculateResult(elementCounts);
+			}
 		}
 
+		long resultPart2 = calculateResult(elementCounts);
+		return Tuple.of(resultPart1, resultPart2);
+	}
+
+	private long calculateResult(Map<String, Long> elementCounts) {
 		long min = elementCounts.values().stream().reduce(Long::min).orElseThrow();
 		long max = elementCounts.values().stream().reduce(Long::max).orElseThrow();
 		return max - min;

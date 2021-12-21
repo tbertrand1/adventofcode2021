@@ -1,11 +1,16 @@
 package fr.t12.adventofcode.days;
 
 import fr.t12.adventofcode.common.BinaryUtil;
+import fr.t12.adventofcode.common.Tuple;
 
 import java.util.List;
 import java.util.function.Function;
 
 public class Day20 extends Day<List<String>, Integer, Integer> {
+
+    private static final int NB_ENHANCEMENTS_PART_1 = 2;
+    private static final int NB_ENHANCEMENTS_PART_2 = 50;
+
     public Day20() {
         super(20);
     }
@@ -16,23 +21,19 @@ public class Day20 extends Day<List<String>, Integer, Integer> {
     }
 
     @Override
-    protected Integer resolvePart1(List<String> input) {
-        return countPixelsHitAfterEnhancements(input, 2);
-    }
-
-    @Override
-    protected Integer resolvePart2(List<String> input) {
-        return countPixelsHitAfterEnhancements(input, 50);
-    }
-
-    private Integer countPixelsHitAfterEnhancements(List<String> input, int nbEnhancements) {
+    protected Tuple<Integer, Integer> resolvePart1AndPart2(List<String> input) {
         String enhancementAlgorithm = input.get(0);
         boolean[][] inputImage = parseImage(input);
-        Image image = new Image(inputImage, nbEnhancements);
-        for (int i = 0; i < nbEnhancements; i++) {
+        Image image = new Image(inputImage, 50);
+        int part1Result = 0;
+        for (int i = 0; i < NB_ENHANCEMENTS_PART_2; i++) {
+            if (i == NB_ENHANCEMENTS_PART_1) {
+                part1Result = image.countPixelsHit();
+            }
             image = image.enhanceImage(enhancementAlgorithm);
         }
-        return image.countPixelsHit();
+        int part2Result = image.countPixelsHit();
+        return Tuple.of(part1Result, part2Result);
     }
 
     private boolean[][] parseImage(List<String> input) {

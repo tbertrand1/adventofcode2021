@@ -1,5 +1,7 @@
 package fr.t12.adventofcode.days;
 
+import fr.t12.adventofcode.common.Tuple;
+
 import java.util.*;
 import java.util.function.Function;
 
@@ -15,18 +17,22 @@ public class Day09 extends Day<Day09.Grid, Integer, Integer> {
     }
 
     @Override
-    protected Integer resolvePart1(Grid grid) {
-        return grid.findLowestPoints().stream().mapToInt(p -> p.getValue() + 1).sum();
-    }
-
-    @Override
-    protected Integer resolvePart2(Grid grid) {
-        return grid.findBasins().stream()
+    protected Tuple<Integer, Integer> resolvePart1AndPart2(Grid grid) {
+        List<Point> lowestPoints = grid.findLowestPoints();
+        int part1Result = lowestPoints.stream().mapToInt(p -> p.getValue() + 1).sum();
+        int part2Result = lowestPoints.stream()
+                .map(point -> {
+                    Set<Point> basin = new HashSet<>();
+                    basin.add(point);
+                    grid.completeBasin(point, basin);
+                    return basin;
+                })
                 .map(Collection::size)
                 .sorted(Collections.reverseOrder())
                 .limit(3)
                 .mapToInt(Integer::intValue)
                 .reduce(1, (s1, s2) -> s1 * s2);
+        return Tuple.of(part1Result, part2Result);
     }
 
     static class Grid {
@@ -54,15 +60,6 @@ public class Day09 extends Day<Day09.Grid, Integer, Integer> {
                 }
             }
             return lowestPoints;
-        }
-
-        public List<Set<Point>> findBasins() {
-            return findLowestPoints().stream().map(point -> {
-                Set<Point> basin = new HashSet<>();
-                basin.add(point);
-                completeBasin(point, basin);
-                return basin;
-            }).toList();
         }
 
         private void completeBasin(Point point, Set<Point> basin) {

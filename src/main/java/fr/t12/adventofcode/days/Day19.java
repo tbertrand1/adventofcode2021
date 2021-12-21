@@ -20,23 +20,18 @@ public class Day19 extends Day<String, Integer, Integer> {
     }
 
     @Override
-    protected Integer resolvePart1(String input) {
+    protected Tuple<Integer, Integer> resolvePart1AndPart2(String input) {
         ScannerWithOrientation[][] allScannersWithOrientations = Scanner.parseScanners(input);
         Tuple<ScannerWithOrientation[], Position[]> scannerOrientationAndPosition = resolve(allScannersWithOrientations);
 
+        // Part 1
         Set<Position> allBeaconsRelatives = new HashSet<>();
         for (int i = 0; i < allScannersWithOrientations.length; i++) {
             ScannerWithOrientation scanner = scannerOrientationAndPosition.first()[i];
             allBeaconsRelatives.addAll(scanner.getAllBeaconsFromRelativePosition(scannerOrientationAndPosition.second()[i]));
         }
-        return allBeaconsRelatives.size();
-    }
 
-    @Override
-    protected Integer resolvePart2(String input) {
-        ScannerWithOrientation[][] allScannersWithOrientations = Scanner.parseScanners(input);
-        Tuple<ScannerWithOrientation[], Position[]> scannerOrientationAndPosition = resolve(allScannersWithOrientations);
-
+        // Part 2
         int maxDistance = 0;
         for (Position scannerA : scannerOrientationAndPosition.second()) {
             for (Position scannerB : scannerOrientationAndPosition.second()) {
@@ -46,7 +41,7 @@ public class Day19 extends Day<String, Integer, Integer> {
                 }
             }
         }
-        return maxDistance;
+        return Tuple.of(allBeaconsRelatives.size(), maxDistance);
     }
 
     private Tuple<ScannerWithOrientation[], Position[]> resolve(ScannerWithOrientation[][] allScannersWithOrientations) {

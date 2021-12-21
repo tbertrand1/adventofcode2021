@@ -26,26 +26,19 @@ public class Day13 extends Day<List<String>, Integer, Day13.Paper> {
     }
 
     @Override
-    protected Integer resolvePart1(List<String> input) {
-        Paper paper = resolve(input, true);
-        return paper.countDots();
-    }
-
-    @Override
-    protected Paper resolvePart2(List<String> input) {
-        return resolve(input, false);
-    }
-
-    private Paper resolve(List<String> input, boolean onlyFirstInstruction) {
+    protected Tuple<Integer, Paper> resolvePart1AndPart2(List<String> input) {
         Tuple<List<Dot>, List<Instruction>> tuple = parseInput(input);
         Paper paper = new Paper(tuple.first());
+        int nbDotsFirstInstruction = 0;
+        boolean firstInstruction = true;
         for (Instruction instruction : tuple.second()) {
             paper.applyInstruction(instruction);
-            if (onlyFirstInstruction) {
-                break;
+            if (firstInstruction) {
+                nbDotsFirstInstruction = paper.countDots();
+                firstInstruction = false;
             }
         }
-        return paper;
+        return Tuple.of(nbDotsFirstInstruction, paper);
     }
 
     private Tuple<List<Dot>, List<Instruction>> parseInput(List<String> input) {

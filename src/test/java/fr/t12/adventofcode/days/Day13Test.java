@@ -1,5 +1,6 @@
 package fr.t12.adventofcode.days;
 
+import fr.t12.adventofcode.common.Tuple;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -35,18 +36,9 @@ public class Day13Test {
     private final List<String> dayInput = day.getInput();
 
     @Test
-    public void testResolvePart1WithSampleInput() {
-        assertEquals(17, day.resolvePart1(sampleInput));
-    }
-
-    @Test
-    public void testResolvePart1WithDayInput() {
-        assertEquals(695, day.resolvePart1(dayInput));
-    }
-
-    @Test
-    public void testResolvePart2WithSampleInput() {
-        Day13.Paper paper = day.resolvePart2(sampleInput);
+    public void testResolvePart1AndPart2WithSampleInput() {
+        Tuple<Integer, Day13.Paper> results = day.resolvePart1AndPart2(sampleInput);
+        assertEquals(17, results.first());
         List<String> expected = List.of(
                 "█████",
                 "█   █",
@@ -56,12 +48,13 @@ public class Day13Test {
                 "     ",
                 "     "
         );
-        assertEquals(expected, paper.toLines());
+        assertEquals(expected, results.second().toLines());
     }
 
     @Test
-    public void testResolvePart2WithDayInput() {
-        Day13.Paper paper = day.resolvePart2(dayInput);
+    public void testResolvePart1AndPart2WithDayInput() {
+        Tuple<Integer, Day13.Paper> results = day.resolvePart1AndPart2(dayInput);
+        assertEquals(695, results.first());
         List<String> expected = List.of(
                 " ██    ██ ████  ██  █    █  █ ███    ██ ",
                 "█  █    █    █ █  █ █    █  █ █  █    █ ",
@@ -70,6 +63,6 @@ public class Day13Test {
                 "█  █ █  █ █    █  █ █    █  █ █    █  █ ",
                 " ███  ██  ████  ███ ████  ██  █     ██  "
         );
-        assertEquals(expected, paper.toLines());
+        assertEquals(expected, results.second().toLines());
     }
 }

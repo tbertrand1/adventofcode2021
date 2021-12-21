@@ -1,5 +1,7 @@
 package fr.t12.adventofcode.days;
 
+import fr.t12.adventofcode.common.Tuple;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -19,24 +21,17 @@ public class Day17 extends Day<String, Integer, Integer> {
     }
 
     @Override
-    protected Integer resolvePart1(String input) {
+    protected Tuple<Integer, Integer> resolvePart1AndPart2(String input) {
         Target target = Target.parse(input);
-        return target.getVelocitiesToCheck()
+        List<Integer> highestVelocities = target.getVelocitiesToCheck()
                 .stream()
                 .map(target::runSteps)
                 .flatMap(Optional::stream)
-                .reduce(Integer::max)
-                .orElseThrow();
-    }
-
-    @Override
-    protected Integer resolvePart2(String input) {
-        Target target = Target.parse(input);
-        return (int) target.getVelocitiesToCheck()
-                .stream()
-                .map(target::runSteps)
-                .flatMap(Optional::stream)
-                .count();
+                .toList();
+        return Tuple.of(
+                highestVelocities.stream().reduce(Integer::max).orElseThrow(),
+                highestVelocities.size()
+        );
     }
 
     record Point(int x, int y) {

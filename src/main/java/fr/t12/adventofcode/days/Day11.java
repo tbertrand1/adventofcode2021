@@ -1,6 +1,7 @@
 package fr.t12.adventofcode.days;
 
 import fr.t12.adventofcode.common.GifSequenceWriter;
+import fr.t12.adventofcode.common.Tuple;
 
 import javax.imageio.stream.FileImageOutputStream;
 import javax.imageio.stream.ImageOutputStream;
@@ -19,7 +20,7 @@ public class Day11 extends Day<List<String>, Integer, Integer> {
 
     public static final int CELL_SIZE = 50;
     private static final int SIZE = 10;
-    private static final int NB_STEPS = 100;
+    private static final int NB_STEPS_PART_1 = 100;
 
 
     public Day11() {
@@ -32,29 +33,19 @@ public class Day11 extends Day<List<String>, Integer, Integer> {
     }
 
     @Override
-    protected Integer resolvePart1(List<String> input) {
+    protected Tuple<Integer, Integer> resolvePart1AndPart2(List<String> input) {
         List<Cell> cells = initializeCells(input);
         int step = 0;
         int nbFlashes = 0;
-        while (step < NB_STEPS) {
-            step++;
-            Set<Cell> cellsFlashes = new HashSet<>();
-            cells.forEach(cell -> cell.incrementValueAndFlash(cellsFlashes));
-            nbFlashes += cellsFlashes.size();
-        }
-        return nbFlashes;
-    }
-
-    @Override
-    protected Integer resolvePart2(List<String> input) {
-        List<Cell> cells = initializeCells(input);
-        int step = 0;
         while (true) {
             step++;
             Set<Cell> cellsFlashes = new HashSet<>();
             cells.forEach(cell -> cell.incrementValueAndFlash(cellsFlashes));
+            if (step <= NB_STEPS_PART_1) {
+                nbFlashes += cellsFlashes.size();
+            }
             if (cellsFlashes.size() == cells.size()) {
-                return step;
+                return Tuple.of(nbFlashes, step);
             }
         }
     }
@@ -82,7 +73,7 @@ public class Day11 extends Day<List<String>, Integer, Integer> {
             List<Cell> cells = initializeCells(getInput());
             writer.writeToSequence(generateBufferedImage(cells));
             int step = 0;
-            while (step < NB_STEPS) {
+            while (step < NB_STEPS_PART_1) {
                 step++;
                 Set<Cell> cellsFlashes = new HashSet<>();
                 cells.forEach(cell -> cell.incrementValueAndFlash(cellsFlashes));

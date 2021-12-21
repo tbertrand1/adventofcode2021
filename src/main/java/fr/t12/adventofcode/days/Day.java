@@ -1,6 +1,7 @@
 package fr.t12.adventofcode.days;
 
 import fr.t12.adventofcode.common.FileUtil;
+import fr.t12.adventofcode.common.Tuple;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
@@ -45,13 +46,21 @@ public abstract class Day<I, O1, O2> {
 
     protected abstract I getInput();
 
-    protected abstract O1 resolvePart1(I input);
+    protected Tuple<O1, O2> resolvePart1AndPart2(I input) {
+        return Tuple.of(resolvePart1(input), resolvePart2(input));
+    }
+
+    protected O1 resolvePart1(I input) {
+        return null;
+    }
 
     protected String formatPart1Result(O1 result1) {
         return result1.toString();
     }
 
-    protected abstract O2 resolvePart2(I input);
+    protected O2 resolvePart2(I input) {
+        return null;
+    }
 
     protected String formatPart2Result(O2 result2) {
         return result2.toString();
@@ -62,22 +71,17 @@ public abstract class Day<I, O1, O2> {
         I input = getInput();
         long inputElapsedTime = System.currentTimeMillis() - inputStart;
 
-        long part1Start = System.currentTimeMillis();
-        O1 result1 = resolvePart1(input);
-        long part1ElapsedTime = System.currentTimeMillis() - part1Start;
-
-        long part2Start = System.currentTimeMillis();
-        O2 result2 = resolvePart2(input);
-        long part2ElapsedTime = System.currentTimeMillis() - part2Start;
+        long resolveStart = System.currentTimeMillis();
+        Tuple<O1, O2> results = resolvePart1AndPart2(input);
+        long resolveElapsedTime = System.currentTimeMillis() - resolveStart;
 
         System.out.printf(
-                "Day %s (%d ms | %d ms | %d ms): %s | %s\n",
+                "Day %s (%d ms | %d ms): %s | %s\n",
                 getDayNumberFormatted(),
                 inputElapsedTime,
-                part1ElapsedTime,
-                part2ElapsedTime,
-                formatPart1Result(result1),
-                formatPart2Result(result2)
+                resolveElapsedTime,
+                formatPart1Result(results.first()),
+                formatPart2Result(results.second())
         );
     }
 

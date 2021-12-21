@@ -1,5 +1,6 @@
 package fr.t12.adventofcode.days;
 
+import fr.t12.adventofcode.common.Tuple;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -24,22 +25,12 @@ public class Day11Test {
     private final List<String> dayInput = day.getInput();
 
     @Test
-    public void testResolvePart1WithSampleInput() {
-        assertEquals(1_656, day.resolvePart1(sampleInput));
+    public void testResolvePart1AndPart2WithSampleInput() {
+        assertEquals(Tuple.of(1_656, 195), day.resolvePart1AndPart2(sampleInput));
     }
 
     @Test
-    public void testResolvePart1WithDayInput() {
-        assertEquals(1_721, day.resolvePart1(dayInput));
-    }
-
-    @Test
-    public void testResolvePart2WithSampleInput() {
-        assertEquals(195, day.resolvePart2(sampleInput));
-    }
-
-    @Test
-    public void testResolvePart2WithDayInput() {
-        assertEquals(298, day.resolvePart2(dayInput));
+    public void testResolvePart1AndPart2WithDayInput() {
+        assertEquals(Tuple.of(1_721, 298), day.resolvePart1AndPart2(dayInput));
     }
 }

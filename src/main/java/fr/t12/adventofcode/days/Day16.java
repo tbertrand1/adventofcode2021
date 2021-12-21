@@ -1,6 +1,7 @@
 package fr.t12.adventofcode.days;
 
 import fr.t12.adventofcode.common.BinaryUtil;
+import fr.t12.adventofcode.common.Tuple;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.mutable.MutableInt;
 
@@ -29,17 +30,10 @@ public class Day16 extends Day<String, Integer, Long> {
     }
 
     @Override
-    protected Integer resolvePart1(String input) {
+    protected Tuple<Integer, Long> resolvePart1AndPart2(String input) {
         String inputBinary = hexToBinary(input);
         Packet packet = Packet.parse(inputBinary, new MutableInt(0));
-        return packet.calculateSumVersions();
-    }
-
-    @Override
-    protected Long resolvePart2(String input) {
-        String inputBinary = hexToBinary(input);
-        Packet packet = Packet.parse(inputBinary, new MutableInt(0));
-        return packet.calculateValue();
+        return Tuple.of(packet.calculateSumVersions(), packet.calculateValue());
     }
 
     static final class Packet {
