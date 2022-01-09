@@ -1,143 +1,129 @@
 package fr.t12.adventofcode.days;
 
-import org.apache.commons.lang3.math.NumberUtils;
-
 import java.util.*;
 import java.util.stream.IntStream;
 
-public class Day24 extends Day<List<Day24.Instruction>, Long, Long> {
+public class Day24 extends Day<Void, Long, Long> {
 
     public Day24() {
         super(24);
     }
 
     @Override
-    protected List<Instruction> getInput() {
-        return readInputAsItems(Instruction::parse);
+    protected Void getInput() {
+        return null;
     }
 
     @Override
-    protected Long resolvePart1(List<Instruction> input) {
+    protected Long resolvePart1(Void input) {
         List<Integer> digits = IntStream.range(1, 10).boxed().sorted(Comparator.reverseOrder()).toList();
-        return findFirstValidMonad(input, digits, digits);
+        return findFirstValidMonad(digits);
     }
 
     @Override
-    protected Long resolvePart2(List<Instruction> input) {
+    protected Long resolvePart2(Void input) {
         List<Integer> digits = IntStream.range(1, 10).boxed().toList();
-        for (int firstDigit : digits) {
-            try {
-                return findFirstValidMonad(input, digits, List.of(firstDigit));
-            } catch (Exception e) {
-            }
-        }
-        throw new IllegalStateException("No solution found");
+        return findFirstValidMonad(digits);
     }
 
-    private Long findFirstValidMonad(List<Instruction> instructions, List<Integer> digits, List<Integer> firstDigits) {
-        return findFirstValidAlu(instructions, digits, firstDigits, 0, Alu.initialAlu(), new HashSet<>())
-                .map(alu -> Long.parseLong(alu.monad))
+    private Long findFirstValidMonad(List<Integer> digits) {
+        return findFirstValidAlu(digits, Program.initialProgram(), new HashSet<>())
+                .map(p -> Long.parseLong(p.monad))
                 .orElseThrow();
     }
 
-    private Optional<Alu> findFirstValidAlu(List<Instruction> instructions, List<Integer> digits, List<Integer> firstDigits,
-                                            int instructionIndex, Alu alu, Set<CacheKey> cache) {
-        if (instructionIndex == instructions.size()) {
-            return alu.isValid() ? Optional.of(alu) : Optional.empty();
+    private Optional<Program> findFirstValidAlu(List<Integer> digits, Program program, Set<Program> cache) {
+        if (program.step == Program.NB_STEPS) {
+            return program.isValid() ? Optional.of(program) : Optional.empty();
         }
 
-        Instruction instruction = instructions.get(instructionIndex);
-        if (instruction.isInputInstruction()) {
-            List<Alu> nextAlus = alu.determineNextAlus(digits, firstDigits, instruction);
-            for (Alu nextAlu : nextAlus) {
-                CacheKey cacheKey = CacheKey.createFromAlu(nextAlu, instructionIndex);
-                if (!cache.contains(cacheKey)) {
-                    Optional<Alu> validAlu = findFirstValidAlu(instructions, digits, firstDigits, instructionIndex + 1, nextAlu, cache);
-                    cache.add(cacheKey);
-                    if (validAlu.isPresent()) {
-                        return validAlu;
-                    }
+        List<Program> nextPrograms = program.determineNextStepProgram(digits);
+        for (Program nextProgram : nextPrograms) {
+            if (!cache.contains(nextProgram)) {
+                Optional<Program> validProgram = findFirstValidAlu(digits, nextProgram, cache);
+                cache.add(nextProgram);
+                if (validProgram.isPresent()) {
+                    return validProgram;
                 }
             }
-            return Optional.empty();
-        } else {
-            alu.applyInstructionOnVariable(instruction);
-            return findFirstValidAlu(instructions, digits, firstDigits, instructionIndex + 1, alu, cache);
         }
+        return Optional.empty();
     }
 
-    record Instruction(String action, String val1, String val2) {
-        public static Instruction parse(String line) {
-            String[] split = line.split(" ");
-            return new Instruction(split[0], split[1], split.length == 3 ? split[2] : null);
+    /**
+     * Represents the input rewrited as a java class.
+     * Input is a list of 14 blocks of 18 lines with specifics values at lines 5, 6, and 16.
+     */
+    static final class Program {
+        private static final int NB_STEPS = 14;
+
+        private static final int[] VARIABLE_LINE_5 = new int[]{
+                1, 1, 1, 1, 26, 1, 1, 26, 1, 26, 26, 26, 26, 26
+        };
+        private static final int[] VARIABLE_LINE_6 = new int[]{
+                12, 11, 10, 10, -16, 14, 12, -4, 15, -7, -8, -4, -15, -8
+        };
+        private static final int[] VARIABLE_LINE_16 = new int[]{
+                6, 12, 5, 10, 7, 0, 4, 12, 14, 13, 10, 11, 9, 9
+        };
+        private int z;
+        private int step;
+        private String monad;
+
+        public Program(int z, int step, String monad) {
+            this.z = z;
+            this.step = step;
+            this.monad = monad;
         }
 
-        public boolean isInputInstruction() {
-            return "inp".equals(this.action);
-        }
-    }
-
-    record Alu(int[] variables, String monad) {
-        public static Alu initialAlu() {
-            return new Alu(new int[4], "");
+        public static Program initialProgram() {
+            return new Program(0, 0, "");
         }
 
-        private static int getVariableIndex(String variable) {
-            return switch (variable) {
-                case "w" -> 0;
-                case "x" -> 1;
-                case "y" -> 2;
-                case "z" -> 3;
-                default -> throw new IllegalArgumentException(String.format("Invalid variable: %s", variable));
-            };
+        private void execute(int w) {
+            int x = this.z % 26;
+            this.z /= VARIABLE_LINE_5[step];
+            x += VARIABLE_LINE_6[step];
+            x = (x == w) ? 0 : 1;
+            int y = 25 * x + 1;
+            this.z *= y;
+            y = (w + VARIABLE_LINE_16[step]) * x;
+            this.z += y;
+
+            this.monad = this.monad.concat(Integer.toString(w));
+            this.step++;
+        }
+
+        public List<Program> determineNextStepProgram(List<Integer> digits) {
+            List<Program> nextSteps = new ArrayList<>();
+            for (Integer digit : digits) {
+                Program nextProgram = this.clone();
+                nextProgram.execute(digit);
+                nextSteps.add(nextProgram);
+            }
+            return nextSteps;
         }
 
         public boolean isValid() {
-            return this.variables[getVariableIndex("z")] == 0;
+            return this.z == 0;
         }
 
-        public List<Alu> determineNextAlus(List<Integer> digits, List<Integer> firstDigits, Instruction instruction) {
-            List<Alu> nextAlus = new ArrayList<>();
-            List<Integer> authorizedDigits = this.monad.length() == 0 ? firstDigits : digits;
-            for (Integer digit : authorizedDigits) {
-                int[] nextVariables = this.variables.clone();
-                nextVariables[getVariableIndex(instruction.val1)] = digit;
-                nextAlus.add(new Alu(nextVariables, String.format("%s%d", this.monad, digit)));
-            }
-            return nextAlus;
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Program program = (Program) o;
+            return this.z == program.z && this.step == program.step;
         }
 
-        public void applyInstructionOnVariable(Instruction instruction) {
-            int val1 = getValue(instruction.val1);
-            int val2 = getValue(instruction.val2);
-            switch (instruction.action) {
-                case "add" -> setValue(instruction.val1, val1 + val2);
-                case "mul" -> setValue(instruction.val1, val1 * val2);
-                case "div" -> setValue(instruction.val1, val1 / val2);
-                case "mod" -> setValue(instruction.val1, val1 % val2);
-                case "eql" -> setValue(instruction.val1, (val1 == val2) ? 1 : 0);
-            }
+        @Override
+        public int hashCode() {
+            return Objects.hash(this.z, this.step);
         }
 
-        private int getValue(String variableOrValue) {
-            if (NumberUtils.isParsable(variableOrValue)) {
-                return Integer.parseInt(variableOrValue);
-            }
-            return this.variables[getVariableIndex(variableOrValue)];
-        }
-
-        private void setValue(String variable, int value) {
-            this.variables[getVariableIndex(variable)] = value;
-        }
-    }
-
-    record CacheKey(int w, int z, int instructionIndex) {
-        public static CacheKey createFromAlu(Alu alu, int instructionIndex) {
-            return new CacheKey(
-                    alu.variables[0],
-                    alu.variables[3],
-                    instructionIndex
-            );
+        @Override
+        protected Program clone() {
+            return new Program(this.z, this.step, this.monad);
         }
     }
 }
